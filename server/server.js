@@ -14,9 +14,18 @@ const io = socketIO(server, {
   }
 })
 
+const users = [];
+
 io.on('connection', (socket) => {
   console.log('Connected')
   
+  socket.on('new-user', name => {
+    users.push({
+      id: socket.id,
+      name: name
+    })
+  })
+
   socket.on('send-chat-message', (data) => {
     socket.broadcast.emit('chat-message', data);
   })
