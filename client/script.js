@@ -16,13 +16,16 @@ socket.on('new-user-joined', (name) => {
 })
 
 socket.on('chat-message', (data) => {
-  appendMessage(data);
+  appendMessage(`${data.username}: ${data.message}`);
 })
 
 messageForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const message = messageInput.value;
+
+  appendMessage(`You: ${message}`);
+
   socket.emit('send-chat-message', message);
 
   messageInput.value = '';

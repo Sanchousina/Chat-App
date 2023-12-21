@@ -14,22 +14,22 @@ const io = socketIO(server, {
   }
 })
 
-const users = [];
+const users = {};
 
 io.on('connection', (socket) => {
   console.log('Connected')
 
   socket.on('new-user', name => {
-    users.push({
-      id: socket.id,
-      name: name
-    })
+    users[socket.id] = name;
 
     socket.broadcast.emit('new-user-joined', name);
   })
 
   socket.on('send-chat-message', (data) => {
-    socket.broadcast.emit('chat-message', data);
+    socket.broadcast.emit('chat-message', {
+      message: data,
+      username: users[socket.id]
+    });
   })
 })
 
