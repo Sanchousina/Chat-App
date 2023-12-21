@@ -11,6 +11,10 @@ if (username) {
   socket.emit('new-user', username);
 }
 
+socket.on('new-user-joined', (name) => {
+  appendMessage(`${name} joined`);
+})
+
 socket.on('chat-message', (data) => {
   appendMessage(data);
 })

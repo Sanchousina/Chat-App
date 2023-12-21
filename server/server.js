@@ -18,12 +18,14 @@ const users = [];
 
 io.on('connection', (socket) => {
   console.log('Connected')
-  
+
   socket.on('new-user', name => {
     users.push({
       id: socket.id,
       name: name
     })
+
+    socket.broadcast.emit('new-user-joined', name);
   })
 
   socket.on('send-chat-message', (data) => {
