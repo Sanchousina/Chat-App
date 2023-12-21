@@ -19,6 +19,10 @@ socket.on('chat-message', (data) => {
   appendMessage(`${data.username}: ${data.message}`);
 })
 
+socket.on('user-disconnected', (username) => {
+  appendMessage(`${username} left chat`);
+})
+
 messageForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
