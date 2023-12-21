@@ -16,7 +16,10 @@ const io = socketIO(server, {
 
 io.on('connection', (socket) => {
   console.log('Connected')
-  socket.emit('chat-message', 'Hello')
+  
+  socket.on('send-chat-message', (data) => {
+    socket.broadcast.emit('chat-message', data);
+  })
 })
 
 server.listen(5000, () => {
