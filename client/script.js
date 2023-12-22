@@ -1,8 +1,11 @@
 const socket = io('http://localhost:5000');
 
 const messageForm = document.getElementById("send-container");
+const sendMessageBtn = document.getElementById("send-button");
 const messageInput = document.getElementById("message-input");
 const messageContainer = document.getElementById("message-container");
+const usernameInput = document.getElementById("username-input");
+const joinChatBtn = document.getElementById("join-chat-button");
 
 function appendMessage(msg) {
   const messageElement = document.createElement('div');
@@ -22,15 +25,20 @@ function submitMessage(e) {
   messageInput.value = '';
 }
 
-function main() {
-  const username = prompt('What is your name?');
+joinChatBtn.addEventListener('click', (e) => main(e));
+
+function main(e) {
+  e.preventDefault();
+  const username = usernameInput.value;
 
   if (username) {
+    sendMessageBtn.disabled = false;
+    joinChatBtn.disabled = true;
+
     appendMessage('You joined to the chat');
-    console.log(username);
     socket.emit('new-user', username);
 
-    messageForm.addEventListener('submit', (e) => submitMessage(e));
+    sendMessageBtn.addEventListener('click', (e) => submitMessage(e));
 
     socket.on('new-user-joined', (name) => {
       appendMessage(`${name} joined`);
@@ -44,10 +52,7 @@ function main() {
       appendMessage(`${username} left chat`);
     })
   } else {
-    messageForm.addEventListener('submit', () => {
-      alert('Enter your name to join chat');
-    });
+    alert('Enter your name to join chat');
+    sendMessageBtn.disabled = true;
   }
 }
-
-main();
