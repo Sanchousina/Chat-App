@@ -29,6 +29,10 @@ io.on('connection', (socket) => {
     
     console.log(users)
     socket.broadcast.emit('new-user-joined', name);
+    
+    if (Object.entries(users).length > 1) {
+      io.to(Object.entries(users)[0][0]).emit('start-key-exchange');
+    }
   })
 
   socket.on('request-public-variables', () => {
@@ -50,13 +54,31 @@ io.on('connection', (socket) => {
     if(usersArray.length === 2 && numOfOperations === 2) {
       io.to(usersArray[nextRecipient][0]).emit('receive-public-key', {
         key: publicKey,
-        endOfRound: true
+        endOfRound: true,
+        groupChat: false
       });
+
+      numOfOperations = 0;
     } else if (usersArray.length === 2 && numOfOperations != 2) {
       io.to(usersArray[nextRecipient][0]).emit('receive-public-key', {
         key: publicKey,
-        endOfRound: false
+        endOfRound: false,
+        groupChat: false
       });
+    } else if (usersArray.length > 2 && numOfOperations != usersArray.length - 1) {
+      io.to(usersArray[nextRecipient][0]).emit('receive-public-key', {
+        key: publicKey,
+        endOfRound: false,
+        groupChat: true
+      });
+    } else if (usersArray.length > 2 && numOfOperations === usersArray.length - 1) {
+      io.to(usersArray[nextRecipient][0]).emit('receive-public-key', {
+        key: publicKey,
+        endOfRound: true,
+        groupChat: true
+      });
+      numOfOperations = 0;
+      // start new round
     }
   })
 
