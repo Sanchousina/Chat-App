@@ -52,61 +52,17 @@ io.on('connection', (socket) => {
 
     console.log(`Next Receipient: ${usersArray[nextRecipient]} \n`);
 
-    // if(usersArray.length === 2 && numOfOperations === 2) {
-    //   io.to(usersArray[nextRecipient][0]).emit('receive-public-key', {
-    //     key: publicKey,
-    //     endOfRound: true,
-    //     groupChat: false
-    //   });
-
-    //   numOfOperations = 0;
-    // } else if (usersArray.length === 2 && numOfOperations != 2) {
-    //   io.to(usersArray[nextRecipient][0]).emit('receive-public-key', {
-    //     key: publicKey,
-    //     endOfRound: false,
-    //     groupChat: false
-    //   });
-    // } else if (usersArray.length > 2 && numOfOperations != usersArray.length - 1) {
-    //   io.to(usersArray[nextRecipient][0]).emit('receive-public-key', {
-    //     key: publicKey,
-    //     endOfRound: false,
-    //     groupChat: true
-    //   });
-    // } else if (usersArray.length > 2 && numOfOperations === usersArray.length - 1) {
-    //   io.to(usersArray[nextRecipient][0]).emit('receive-public-key', {
-    //     key: publicKey,
-    //     endOfRound: true,
-    //     groupChat: true
-    //   });
-      
-    //   numOfOperations = 0;
-
-    //   // start new round
-    //   if (nextRecipient != usersArray.length - 2) {
-    //     startExchangeUserIndex++;
-
-    //     console.log(`Next start user: ${usersArray[startExchangeUserIndex][1]}`)
-    //     io.to(usersArray[startExchangeUserIndex][0]).emit('start-key-exchange');
-    //   } else {
-    //     console.log('EVERYONE HAS SECRET KEY');
-    //     startExchangeUserIndex = 0;
-    //   }
-    // }
-
     if (usersArray.length >= 2) {
-      const isEndOfRound = (usersArray.length === 2 && numOfOperations === 2) || (usersArray.length > 2 && numOfOperations === usersArray.length - 1);
+      const endOfRound = isEndOfRound(usersArray, numOfOperations);
       const isGroupChat = usersArray.length > 2;
-
-      console.log('isEndOfRound: ', isEndOfRound)
-      console.log('isGroupChat: ', isGroupChat)
     
       io.to(usersArray[nextRecipient][0]).emit('receive-public-key', {
         key: publicKey,
-        endOfRound: isEndOfRound,
+        endOfRound: endOfRound,
         groupChat: isGroupChat
       });
     
-      if (isEndOfRound) {
+      if (endOfRound) {
         numOfOperations = 0;
     
         // Start new round
@@ -139,3 +95,7 @@ io.on('connection', (socket) => {
 server.listen(5000, () => {
   console.log('Server is running');
 })
+
+function isEndOfRound(usersArray, numOfOperations) {
+  return (usersArray.length === 2 && numOfOperations === 2) || (usersArray.length > 2 && numOfOperations === usersArray.length - 1);
+}
