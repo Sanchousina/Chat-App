@@ -1,5 +1,6 @@
 const socket = io('http://localhost:5000');
 import { generateAesKeyFromSmallKey, encryptWithAes, decryptWithAes } from "./aes.js";
+import { generateRandomSecret } from "./util.js";
 
 const messageForm = document.getElementById("send-container");
 const sendMessageBtn = document.getElementById("send-button");
@@ -9,6 +10,7 @@ const usernameInput = document.getElementById("username-input");
 const joinChatBtn = document.getElementById("join-chat-button");
 
 let privateKeyAES;
+let p, g;
 
 function appendMessage(msg) {
   const messageElement = document.createElement('div');
@@ -27,7 +29,7 @@ async function submitMessage(e) {
     appendMessage(`You: ${message}`);
   
     const aesCiphertext = await encryptWithAes(message, privateKeyAES);
-    console.log('AES Ciphertext with CBC:', aesCiphertext);
+    console.log('AES Ciphertext:', aesCiphertext);
   
     socket.emit('send-chat-message', aesCiphertext);
   
@@ -48,10 +50,7 @@ function main(e) {
     appendMessage('You joined to the chat');
     socket.emit('new-user', username);
 
-    let p, g;
-    //let privateKeyAES;
-
-    const secret = Math.floor(Math.random() * 9) + 1;
+    const secret = generateRandomSecret();
     console.log(`Secret for ${username}: ${secret}`);
 
     socket.emit('request-public-variables');
