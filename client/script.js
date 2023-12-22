@@ -38,6 +38,17 @@ function main(e) {
     appendMessage('You joined to the chat');
     socket.emit('new-user', username);
 
+    const secret = Math.floor(Math.random() * 9) + 1;
+    console.log(`Secret for ${username}: ${secret}`);
+
+    socket.emit('request-public-variables');
+
+    socket.on('receive-public-variables', data => {
+      const {p, g} = data;
+      console.log('P: ', p);
+      console.log('G: ', g);
+    })
+
     sendMessageBtn.addEventListener('click', (e) => submitMessage(e));
 
     socket.on('new-user-joined', (name) => {

@@ -14,6 +14,9 @@ const io = socketIO(server, {
   }
 })
 
+const p = 23;  // g mod p
+const g = 5;
+
 const users = {};
 
 io.on('connection', (socket) => {
@@ -21,8 +24,13 @@ io.on('connection', (socket) => {
 
   socket.on('new-user', name => {
     users[socket.id] = name;
-
+    
+    console.log(users)
     socket.broadcast.emit('new-user-joined', name);
+  })
+
+  socket.on('request-public-variables', () => {
+    socket.emit('receive-public-variables', {p: p, g: g});
   })
 
   socket.on('send-chat-message', (data) => {
