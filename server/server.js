@@ -34,7 +34,25 @@ io.on('connection', (socket) => {
   })
 
   socket.on('exchange-public-key', publicKey => {
-    console.log(`Public key for ${users[socket.id]}: ${publicKey}`)
+    console.log(`Public key for ${users[socket.id]}: ${publicKey}`);
+
+    const usersArray = Object.entries(users);
+    const senderIndex = usersArray.findIndex(user => user[0] === socket.id);
+    const nextRecipient = (senderIndex === usersArray.length - 1) ? 0 : senderIndex + 1;
+
+    console.log(`Next Receipient: ${usersArray[nextRecipient]}`);
+
+    if(usersArray.length === 2 && senderIndex === 1) {
+      io.to(usersArray[nextRecipient][0]).emit('receive-public-key', {
+        key: publicKey,
+        end: true
+      });
+    } else {
+      io.to(usersArray[nextRecipient][0]).emit('receive-public-key', {
+        key: publicKey,
+        end: false
+      });
+    }
   })
 
   socket.on('send-chat-message', (data) => {

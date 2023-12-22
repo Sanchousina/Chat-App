@@ -38,27 +38,45 @@ function main(e) {
     appendMessage('You joined to the chat');
     socket.emit('new-user', username);
 
+    let p, g;
+
     const secret = Math.floor(Math.random() * 9) + 1;
     console.log(`Secret for ${username}: ${secret}`);
 
     socket.emit('request-public-variables');
 
     socket.on('receive-public-variables', data => {
-      const {p, g} = data;
+      p = data.p, g = data.g;
+
       console.log('P: ', p);
       console.log('G: ', g);
 
-      const publicKey = g**secret%p;
-      console.log(`Public key for ${username}: ${publicKey}`);
-      socket.emit('exchange-public-key', publicKey);
+      // const publicKey = g**secret%p;
+      // console.log(`Public key for ${username}: ${publicKey}`);
+      // socket.emit('exchange-public-key', publicKey);
     })
 
     sendMessageBtn.addEventListener('click', (e) => submitMessage(e));
 
     socket.on('new-user-joined', (name) => {
       appendMessage(`${name} joined`);
+
+      const publicKey = g**secret%p;
+      console.log(`Public key for ${username}: ${publicKey}`);
+      socket.emit('exchange-public-key', publicKey);
     })
     
+    socket.on('receive-public-key', data => {
+      const privateKey = data.key**secret%p;
+
+      console.log(`Private key for ${username}: ${privateKey}`);
+
+      if (data.end === false) {
+        const publicKey = g**secret%p;
+        socket.emit('exchange-public-key', publicKey);
+      }
+    })
+
     socket.on('chat-message', (data) => {
       appendMessage(`${data.username}: ${data.message}`);
     })
