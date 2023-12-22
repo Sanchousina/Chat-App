@@ -33,6 +33,10 @@ io.on('connection', (socket) => {
     socket.emit('receive-public-variables', {p: p, g: g});
   })
 
+  socket.on('exchange-public-key', publicKey => {
+    console.log(`Public key for ${users[socket.id]}: ${publicKey}`)
+  })
+
   socket.on('send-chat-message', (data) => {
     socket.broadcast.emit('chat-message', {
       message: data,

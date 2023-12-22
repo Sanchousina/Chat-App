@@ -47,6 +47,10 @@ function main(e) {
       const {p, g} = data;
       console.log('P: ', p);
       console.log('G: ', g);
+
+      const publicKey = g**secret%p;
+      console.log(`Public key for ${username}: ${publicKey}`);
+      socket.emit('exchange-public-key', publicKey);
     })
 
     sendMessageBtn.addEventListener('click', (e) => submitMessage(e));
