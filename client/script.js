@@ -68,7 +68,6 @@ function main(e) {
 
     socket.on('start-key-exchange', () => {
       const publicKey = g**secret%p;
-      //console.log(`Public key for ${username}: ${publicKey}`);
       socket.emit('exchange-public-key', publicKey);
     });
     
@@ -78,14 +77,12 @@ function main(e) {
 
         if (!data.endOfRound) {
           const publicKey = data.key**secret%p;
-          //console.log(`Public key for ${username}: ${publicKey}`);
           socket.emit('exchange-public-key', publicKey);
         } else {
           const privateKey = data.key**secret%p;
           console.log(`Private key for ${username}: ${privateKey}`);
 
           privateKeyAES = await generateAesKeyFromSmallKey(privateKey);
-          console.log(`Private AES key for ${username}: ${privateKeyAES}`);
         }
 
       } else {
@@ -93,6 +90,8 @@ function main(e) {
 
         const privateKey = data.key**secret%p;
         console.log(`Private key for ${username}: ${privateKey}`);
+
+        privateKeyAES = await generateAesKeyFromSmallKey(privateKey);
   
         if (!data.endOfRound) {
           const publicKey = g**secret%p;
