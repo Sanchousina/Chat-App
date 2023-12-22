@@ -20,6 +20,7 @@ const g = 5;
 const users = {};
 
 let numOfOperations = 0;
+let startExchangeUserIndex = 0;
 
 io.on('connection', (socket) => {
   console.log('Connected')
@@ -31,7 +32,7 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('new-user-joined', name);
     
     if (Object.entries(users).length > 1) {
-      io.to(Object.entries(users)[0][0]).emit('start-key-exchange');
+      io.to(Object.entries(users)[startExchangeUserIndex][0]).emit('start-key-exchange');
     }
   })
 
@@ -49,7 +50,7 @@ io.on('connection', (socket) => {
     const senderIndex = usersArray.findIndex(user => user[0] === socket.id);
     const nextRecipient = (senderIndex === usersArray.length - 1) ? 0 : senderIndex + 1;
 
-    console.log(`Next Receipient: ${usersArray[nextRecipient]}`);
+    console.log(`Next Receipient: ${usersArray[nextRecipient]} \n`);
 
     if(usersArray.length === 2 && numOfOperations === 2) {
       io.to(usersArray[nextRecipient][0]).emit('receive-public-key', {
@@ -78,7 +79,17 @@ io.on('connection', (socket) => {
         groupChat: true
       });
       numOfOperations = 0;
+
       // start new round
+      if (nextRecipient != usersArray.length - 2) {
+        startExchangeUserIndex++;
+
+        console.log(`Next start user: ${usersArray[startExchangeUserIndex][1]}`)
+        io.to(usersArray[startExchangeUserIndex][0]).emit('start-key-exchange');
+      } else {
+        console.log('EVERYONE HAS SECRET KEY');
+        startExchangeUserIndex = 0;
+      }
     }
   })
 

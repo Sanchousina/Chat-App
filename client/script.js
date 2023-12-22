@@ -50,35 +50,27 @@ function main(e) {
 
       console.log('P: ', p);
       console.log('G: ', g);
-
-      // const publicKey = g**secret%p;
-      // console.log(`Public key for ${username}: ${publicKey}`);
-      // socket.emit('exchange-public-key', publicKey);
     })
 
     sendMessageBtn.addEventListener('click', (e) => submitMessage(e));
 
     socket.on('new-user-joined', (name) => {
       appendMessage(`${name} joined`);
-
-      // const publicKey = g**secret%p;
-      // console.log(`Public key for ${username}: ${publicKey}`);
-      // socket.emit('exchange-public-key', publicKey);
     })
 
     socket.on('start-key-exchange', () => {
       const publicKey = g**secret%p;
-      console.log(`Public key for ${username}: ${publicKey}`);
+      //console.log(`Public key for ${username}: ${publicKey}`);
       socket.emit('exchange-public-key', publicKey);
     });
     
     socket.on('receive-public-key', data => {
       if (data.groupChat) {
-        // if 3 and more users:
+        // if 3 or more users:
 
         if (!data.endOfRound) {
           const publicKey = data.key**secret%p;
-          console.log(`Public key for ${username}: ${publicKey}`);
+          //console.log(`Public key for ${username}: ${publicKey}`);
           socket.emit('exchange-public-key', publicKey);
         } else {
           const privateKey = data.key**secret%p;
