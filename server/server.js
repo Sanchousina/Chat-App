@@ -19,6 +19,8 @@ const g = 5;
 
 const users = {};
 
+let numOfOperations = 0;
+
 io.on('connection', (socket) => {
   console.log('Connected')
 
@@ -36,21 +38,24 @@ io.on('connection', (socket) => {
   socket.on('exchange-public-key', publicKey => {
     console.log(`Public key for ${users[socket.id]}: ${publicKey}`);
 
+    numOfOperations += 1;
+    console.log('Number of Operation: ', numOfOperations);
+
     const usersArray = Object.entries(users);
     const senderIndex = usersArray.findIndex(user => user[0] === socket.id);
     const nextRecipient = (senderIndex === usersArray.length - 1) ? 0 : senderIndex + 1;
 
     console.log(`Next Receipient: ${usersArray[nextRecipient]}`);
 
-    if(usersArray.length === 2 && senderIndex === 1) {
+    if(usersArray.length === 2 && numOfOperations === 2) {
       io.to(usersArray[nextRecipient][0]).emit('receive-public-key', {
         key: publicKey,
-        end: true
+        endOfRound: true
       });
-    } else {
+    } else if (usersArray.length === 2 && numOfOperations != 2) {
       io.to(usersArray[nextRecipient][0]).emit('receive-public-key', {
         key: publicKey,
-        end: false
+        endOfRound: false
       });
     }
   })

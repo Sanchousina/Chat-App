@@ -71,7 +71,7 @@ function main(e) {
 
       console.log(`Private key for ${username}: ${privateKey}`);
 
-      if (data.end === false) {
+      if (data.endOfRound === false) {
         const publicKey = g**secret%p;
         socket.emit('exchange-public-key', publicKey);
       }
