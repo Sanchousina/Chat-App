@@ -40,7 +40,7 @@ io.on('connection', (socket) => {
     socket.emit('receive-public-variables', {p: p, g: g});
   })
 
-  socket.on('exchange-public-key', publicKey => {
+  socket.on('exchange-public-key', ({publicKey, g, p}) => {
     console.log(`Public key for ${users[socket.id]}: ${publicKey}`);
 
     numOfOperations += 1;
@@ -59,7 +59,9 @@ io.on('connection', (socket) => {
       io.to(usersArray[nextRecipient][0]).emit('receive-public-key', {
         key: publicKey,
         endOfRound: endOfRound,
-        groupChat: isGroupChat
+        groupChat: isGroupChat,
+        g: g, 
+        p: p
       });
     
       if (endOfRound) {

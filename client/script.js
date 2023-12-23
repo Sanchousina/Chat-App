@@ -68,7 +68,7 @@ function main(e) {
 
     socket.on('start-key-exchange', () => {
       const publicKey = g**secret%p;
-      socket.emit('exchange-public-key', publicKey);
+      socket.emit('exchange-public-key', {publicKey: publicKey, p: p, g: g});
     });
     
     socket.on('receive-public-key', async data => {
@@ -76,10 +76,10 @@ function main(e) {
         // if 3 or more users:
 
         if (!data.endOfRound) {
-          const publicKey = data.key**secret%p;
-          socket.emit('exchange-public-key', publicKey);
+          const publicKey = data.key**secret%data.p;
+          socket.emit('exchange-public-key', {publicKey: publicKey, p: p, g: g});
         } else {
-          const privateKey = data.key**secret%p;
+          const privateKey = data.key**secret%data.p;
           console.log(`Private key for ${username}: ${privateKey}`);
 
           privateKeyAES = await generateAesKeyFromSmallKey(privateKey);
@@ -88,14 +88,14 @@ function main(e) {
       } else {
         // if 2 users:
 
-        const privateKey = data.key**secret%p;
+        const privateKey = data.key**secret%data.p;
         console.log(`Private key for ${username}: ${privateKey}`);
 
         privateKeyAES = await generateAesKeyFromSmallKey(privateKey);
   
         if (!data.endOfRound) {
-          const publicKey = g**secret%p;
-          socket.emit('exchange-public-key', publicKey);
+          const publicKey = data.g**secret%data.p;
+          socket.emit('exchange-public-key', {publicKey: publicKey, p: p, g: g});
         }
       }
     })
